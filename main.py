@@ -1,15 +1,20 @@
 import discord
 from discord.commands import slash_command
-from discord.ext import commands
+from discord.ext import commands, tasks
 import logger
 
 import asyncio
 import random
 import json
+from itertools import cycle
 
 with open("config.json", "r") as f:
     config = json.load(f)
     token = config["token"]
+
+activity = cycle(["먀아아아",
+                  "{}곳의 서버에서 오미쿠지 뽑기",
+                  "{}곳의 서버에서 그루밍"])
 
 intents = discord.Intents.default()
 
@@ -21,6 +26,7 @@ class Myas_Bot(discord.AutoShardedBot):
         debug_guilds=None,
         )
         self.add_cog(CommandsCog(self))
+        self.add_cog(CycleCog(self))
     
     async def on_ready(self):
         logger.log("--- 로딩이 완료되었어요! ---")
@@ -33,6 +39,7 @@ class Myas_Bot(discord.AutoShardedBot):
 class CommandsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        logger.log("CommandsCog 로딩 성공!")
 
     @slash_command(name="오미쿠지", description="오미쿠지를 한번 뽑아보세요!")
     async def gacha(self, ctx: discord.ApplicationContext):
@@ -95,7 +102,8 @@ class CommandsCog(commands.Cog):
     async def myas(self, ctx: discord.ApplicationContext):
         logger.command_log("먀스", ctx)
         latency = int(self.bot.latency * 1000)
-        await ctx.respond(f"오늘도 먀아아ㅏ 인거에요!\n`ping={latency}ms`")
+        await ctx.respond(f"오늘도 먀아아ㅏ 인거에요!\n" +
+                          "`ping={latency}ms`\n")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
@@ -105,6 +113,19 @@ class CommandsCog(commands.Cog):
             response = random.choice(responses)
             return await msg.channel.send(response)
 
+
+class CycleCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+        logger.log("CycleCog 로딩 성공!")
+        self.change_activity.start()
+
+    @tasks.loop(seconds=10)
+    async def change_activity(self):
+        playing = next(activity).format(len(self.bot.guilds))
+        await self.bot.change_presence(activity=discord.Game(name=playing))
+    
 myasbot = Myas_Bot()
 # Token stored at config.json like {"token":"(token)"}
 myasbot.run(token=token)

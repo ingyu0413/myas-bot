@@ -20,6 +20,7 @@ intents = discord.Intents.default()
 
 class Myas_Bot(discord.AutoShardedBot):
     def __init__(self):
+        logger.log("--# 로딩을 시작할게요!")
         super().__init__(
         help_command=None,
         intents=intents,
@@ -29,7 +30,7 @@ class Myas_Bot(discord.AutoShardedBot):
         self.add_cog(CycleCog(self))
     
     async def on_ready(self):
-        logger.log("--- 로딩이 완료되었어요! ---")
+        logger.log("--# 로딩이 완료되었어요!")
         logger.log(f"봇 이름: {self.user.name}")
         logger.log(f"봇 아이디: {self.user.id}")
         logger.log(f"봇 서버 수: {len(self.guilds)}")
@@ -117,11 +118,10 @@ class CommandsCog(commands.Cog):
 class CycleCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-        logger.log("CycleCog 로딩 성공!")
         self.change_activity.start()
+        logger.log("CycleCog 로딩 성공!")
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=30)
     async def change_activity(self):
         playing = next(activity).format(len(self.bot.guilds))
         await self.bot.change_presence(activity=discord.Game(name=playing))

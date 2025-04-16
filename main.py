@@ -102,8 +102,8 @@ class CommandsCog(commands.Cog):
     async def myas(self, ctx: discord.ApplicationContext):
         logger.command_log("먀스", ctx)
         latency = int(self.bot.latency * 1000)
-        await ctx.respond(f"오늘도 먀아아ㅏ 인거에요!\n" +
-                          "`ping={latency}ms`\n")
+        await ctx.respond("오늘도 먀아아ㅏ 인거에요!\n" +
+                          f"`ping={latency}ms`")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):

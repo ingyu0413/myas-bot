@@ -45,7 +45,7 @@ class CommandsCog(commands.Cog):
     @slash_command(name="오미쿠지", description="오미쿠지를 한번 뽑아보세요!")
     async def gacha(self, ctx: discord.ApplicationContext):
         await ctx.defer()
-        logger.command_log("오미쿠지", ctx)
+        logger.command_log(ctx)
 
         class Button(discord.ui.View):
             def __init__(self, ctx: discord.ApplicationContext):
@@ -66,7 +66,7 @@ class CommandsCog(commands.Cog):
                 await interation.response.defer()
         
             async def interaction_check(self, interaction):
-                logger.command_log("오미쿠지", ctx, f"Button clicked by {interaction.user.name}({interaction.user.id})")
+                logger.command_log(ctx, f"Button clicked by {interaction.user.name}({interaction.user.id})")
                 if interaction.user != self.ctx.author:
                     await interaction.response.send_message("남의 뽑기는 건들지 말고 뽑기 명령어를 직접 실행하자!", ephemeral=True)
                     self.button_value = None
@@ -80,13 +80,13 @@ class CommandsCog(commands.Cog):
 
         result = await view.wait()
         if result:
-            logger.command_log("오미쿠지", ctx, "Timed out")
+            logger.command_log(ctx, "Timed out")
             embed = discord.Embed(title="도대체 언제 버튼을 누를 생각인거야... \\:(")
             return await ctx.edit(embed=embed, view=None)
         if not result:
             view.stop()
             if view.button_value == "그만두기":
-                logger.command_log("오미쿠지", ctx, "Cancelled")
+                logger.command_log(ctx, "Cancelled")
                 embed = discord.Embed(title="오미쿠지를 그만뒀어요. \\:(")
                 return await ctx.edit(embed=embed, view=None)
             else:
@@ -95,13 +95,13 @@ class CommandsCog(commands.Cog):
                 await asyncio.sleep(3)
                 results = ["대길", "길", "중길", "소길", "말길", "흉", "대흉"]
                 result = random.choice(results)
-                logger.command_log("오미쿠지", ctx, f"Result = {result}")
+                logger.command_log(ctx, f"Result = {result}")
                 embed = discord.Embed(title=f"{result}이 나왔어요!", description="`오미쿠지 결과 때문에 오늘 하루를 망치지는 말아요!`")
                 return await ctx.edit(embed=embed, view=None)
 
     @slash_command(name="먀스", description="먀아아ㅏ")
     async def myas(self, ctx: discord.ApplicationContext):
-        logger.command_log("먀스", ctx)
+        logger.command_log(ctx)
         latency = int(self.bot.latency * 1000)
         await ctx.respond("오늘도 먀아아ㅏ 인거에요!\n" +
                           f"`ping={latency}ms`")

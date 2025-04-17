@@ -110,7 +110,15 @@ class CommandsCog(commands.Cog):
     async def on_message(self, msg: discord.Message):
         if msg.content.startswith(f"<@{self.bot.user.id}>"):
             logger.mention_log(msg)
+            a = ""
+            try:
+                a = msg.content.split()[1]
+            except IndexError:
+                pass
+
             responses = ["먀아?", "먀아!", "먀아..."]
+            if a == "🀄":
+                responses = ["론냐!", "쯔모냐!"]
             response = random.choice(responses)
             return await msg.channel.send(response)
 

@@ -119,6 +119,10 @@ class CommandsCog(commands.Cog):
             responses = ["먀아?", "먀아!", "먀아..."]
             if a == "🀄":
                 responses = ["론냐!", "쯔모냐!"]
+            if a == "🎴":
+                responses = ["38광땡!", "고!", "스톱!"]
+            if a == "🃏":
+                responses = ["원카드!"]
             response = random.choice(responses)
             return await msg.channel.send(response)
 

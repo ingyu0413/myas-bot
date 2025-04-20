@@ -12,10 +12,11 @@ with open("config.json", "r") as f:
     config = json.load(f)
     token = config["token"]
 
-activity = cycle(["먀아아아",
-                  "{}곳의 서버에서 오미쿠지 뽑기",
-                  "{}곳의 서버에서 그루밍"])
+ACTIVITIES = ["먀아아아",
+              "{}곳의 서버에서 오미쿠지 뽑기",
+              "{}곳의 서버에서 그루밍"]
 
+activity = cycle(ACTIVITIES)
 intents = discord.Intents.default()
 
 class Myas_Bot(discord.AutoShardedBot):

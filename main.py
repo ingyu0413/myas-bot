@@ -104,9 +104,12 @@ class CommandsCog(commands.Cog):
     async def myas(self, ctx: discord.ApplicationContext):
         logger.command_log(ctx)
         latency = int(self.bot.latency * 1000)
-        await ctx.respond("오늘도 먀아아ㅏ 인거에요!\n" +
-                          f"`ping={latency}ms`")
-
+        responses = ["먀아?", "먀아!", "먀아..."]
+        response = random.choice(responses)
+        embed = discord.Embed(title=f"오늘도 {response} 인거에요!",
+                              description=f"`ping={latency}ms`")
+        await ctx.respond(embed=embed)
+                          
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         if msg.content.startswith(f"<@{self.bot.user.id}>"):

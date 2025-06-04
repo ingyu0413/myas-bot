@@ -67,7 +67,7 @@ class CommandsCog(commands.Cog):
                 await interation.response.defer()
         
             async def interaction_check(self, interaction):
-                logger.command_log(ctx, f"Button clicked by {interaction.user.name}({interaction.user.id})")
+                logger.command_log(ctx, f"Button {self.button_value} clicked by {interaction.user.name}({interaction.user.id})")
                 if interaction.user != self.ctx.author:
                     await interaction.response.send_message("남의 뽑기는 건들지 말고 뽑기 명령어를 직접 실행하자!", ephemeral=True)
                     self.button_value = None
@@ -94,21 +94,44 @@ class CommandsCog(commands.Cog):
                 embed = discord.Embed(title="오미쿠지를 뽑는 중...", description="*\\*샤카샤카\\*... \\*샤카샤카\\*...*")
                 await ctx.edit(embed=embed, view=None)
                 await asyncio.sleep(3)
+
+                class Button_TIE(discord.ui.View):
+                    def __init__(self, ctx: discord.ApplicationContext):
+                        super().__init__(timeout=10 + ctx.bot.latency)
+                        self.ctx = ctx
+                        self.button_value = None
+                    
+                    @discord.ui.button(label="묶기", style=discord.ButtonStyle.secondary)
+                    async def yes(self, button: discord.ui.Button, interation: discord.Interaction):
+                        self.button_value = "묶기"
+                        self.stop()
+                        await interation.response.defer()
+                
+                    async def interaction_check(self, interaction):
+                        logger.command_log(ctx, f"Button {self.button_value} clicked by {interaction.user.name}({interaction.user.id})")
+                        if interaction.user != self.ctx.author:
+                            await interaction.response.send_message("남의 뽑기는 건들지 말고 뽑기 명령어를 직접 실행하자!", ephemeral=True)
+                            self.button_value = None
+                            return False
+                        else:
+                            return True
+                        
                 results = ["대길", "길", "중길", "소길", "말길", "흉", "대흉"]
                 result = random.choice(results)
                 logger.command_log(ctx, f"Result = {result}")
                 embed = discord.Embed(title=f"{result}이 나왔어요!", description="`오미쿠지 결과 때문에 오늘 하루를 망치지는 말아요!`")
-                return await ctx.edit(embed=embed, view=None)
+                view = Button_TIE(ctx)
+                await ctx.edit(embed=embed, view=view)
+                result = await view.wait()
 
-    @slash_command(name="먀스", description="먀아아ㅏ")
-    async def myas(self, ctx: discord.ApplicationContext):
-        logger.command_log(ctx)
-        latency = int(self.bot.latency * 1000)
-        responses = ["먀아?", "먀아!", "먀아..."]
-        response = random.choice(responses)
-        embed = discord.Embed(title=f"오늘도 {response} 인거에요!",
-                              description=f"`ping={latency}ms`")
-        await ctx.respond(embed=embed)
+                if result:
+                    return await ctx.edit(embed=embed, view=None)
+                if not result:
+                    view.stop()
+                    if view.button_value == "묶기":
+                        logger.command_log(ctx, "Tied")
+                        embed = discord.Embed(title="오미쿠지 결과를 묶었어요! \\:D", description="`이번 오미쿠지 결과는 묶어두고 다음을 기대해봐요!`")
+                        return await ctx.edit(embed=embed, view=None)
                           
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
